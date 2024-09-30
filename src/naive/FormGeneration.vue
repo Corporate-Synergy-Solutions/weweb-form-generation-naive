@@ -45,6 +45,8 @@ const props = defineProps({
     },
 });
 
+const emit = defineEmits(['submitted']);
+
 const formRef = ref(null);
 const formValue = ref({});
 const rules = ref({});
@@ -58,6 +60,7 @@ function onSubmit(e) {
             invalid.value = false;
         } else {
             invalid.value = true;
+            emit('submitted', formValue.value);
         }
     });
 }

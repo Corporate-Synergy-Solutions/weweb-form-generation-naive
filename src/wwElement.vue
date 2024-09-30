@@ -1,5 +1,15 @@
 <template>
-    <FormGenerator :key="updateComponent" :schema="content.schema" />
+    <FormGenerator
+        :key="updateComponent"
+        :schema="content.schema"
+        @submitted="
+            e =>
+                $emit('trigger-event', {
+                    name: 'event:submitted',
+                    event: e,
+                })
+        "
+    />
 </template>
 
 <script setup>
