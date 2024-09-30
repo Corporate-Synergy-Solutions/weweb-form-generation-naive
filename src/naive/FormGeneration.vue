@@ -41,7 +41,7 @@ import { ref, onBeforeMount } from 'vue';
 const props = defineProps({
     schema: {
         type: [Object, String],
-        required: true,
+        default: '',
     },
 });
 
@@ -53,8 +53,8 @@ const rules = ref({});
 const components = ref([]);
 const invalid = ref(false);
 
-function onSubmit(e) {
-    e.preventDefault();
+function onSubmit(event) {
+    event.preventDefault();
     formRef.value?.validate(errors => {
         if (!errors) {
             invalid.value = false;
@@ -80,6 +80,7 @@ function parseJson(str) {
 }
 
 onBeforeMount(() => {
+    if (!props.schema) return;
     const arrComp = [];
     let r = {};
     let formVal = {};
