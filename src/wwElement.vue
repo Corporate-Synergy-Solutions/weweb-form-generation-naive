@@ -1,0 +1,30 @@
+<template>
+    <n-message-provider>
+        <FormGenerator :key="updateComponent" :schema="content.schema" />
+    </n-message-provider>
+</template>
+
+<script setup>
+import { NMessageProvider } from 'naive-ui';
+import { ref, watch } from 'vue';
+import FormGenerator from './naive/FormGeneration.vue';
+
+const props = defineProps({
+    content: { type: Object, required: true },
+});
+
+const schema = {
+    name: { label: 'Name', required: true },
+    email: { type: 'email', label: 'Email', required: true },
+    message: { type: 'textarea', label: 'Message' },
+    date: { type: 'date', label: 'Date', required: true },
+    country: { type: 'select', label: 'Country', required: true, options: ['USA', 'Canada', 'UK', 'Germany'] },
+};
+
+const updateComponent = ref(1);
+watch(
+    () => props.content,
+    () => (updateComponent.value += 1),
+    { deep: true }
+);
+</script>
