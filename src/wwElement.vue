@@ -1,11 +1,8 @@
 <template>
-    <n-message-provider>
-        <FormGenerator :key="updateComponent" :schema="content.schema" />
-    </n-message-provider>
+    <FormGenerator :key="updateComponent" :schema="content.schema" />
 </template>
 
 <script setup>
-import { NMessageProvider } from 'naive-ui';
 import { ref, watch } from 'vue';
 import FormGenerator from './naive/FormGeneration.vue';
 

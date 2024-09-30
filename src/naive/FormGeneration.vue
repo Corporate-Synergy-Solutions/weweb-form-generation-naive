@@ -1,5 +1,8 @@
 <template>
     <n-form v-if="schema" ref="formRef" :model="formValue" :rules="rules">
+        <n-alert v-if="invalid" title="Error Text" type="error" :style="{ marginBottom: '20px' }">
+            Form is invalid
+        </n-alert>
         <n-form-item v-for="item in components" :label="item.label" :path="item.path" :key="item.path">
             <component
                 :is="item.name"
@@ -18,7 +21,7 @@
 </template>
 
 <script>
-import { NForm, NFormItem, NInput, NButton, NSelect, NDatePicker } from 'naive-ui';
+import { NForm, NFormItem, NInput, NButton, NSelect, NDatePicker, NAlert } from 'naive-ui';
 export default {
     components: {
         NForm,
@@ -27,13 +30,13 @@ export default {
         NButton,
         NSelect,
         NDatePicker,
+        NAlert,
     },
 };
 </script>
 
 <script setup>
 import { ref, onBeforeMount } from 'vue';
-import { useMessage } from 'naive-ui';
 
 const props = defineProps({
     schema: {
@@ -42,19 +45,19 @@ const props = defineProps({
     },
 });
 
-const message = useMessage();
 const formRef = ref(null);
 const formValue = ref({});
 const rules = ref({});
 const components = ref([]);
+const invalid = ref(false);
 
 function onSubmit(e) {
     e.preventDefault();
     formRef.value?.validate(errors => {
         if (!errors) {
-            message.success('Submit successful');
+            invalid.value = false;
         } else {
-            message.error('Form invalid');
+            invalid.value = true;
         }
     });
 }
