@@ -9,9 +9,23 @@
                 v-model:value="formValue[item.path]"
                 v-bind="{
                     options: item.options || undefined,
-                    type: item.type,
+                    type: item.type || undefined,
                 }"
-            />
+            >
+                <template v-if="item.children">
+                    <component
+                        v-for="children in item.children"
+                        :key="children.name"
+                        :is="children.name"
+                        v-bind="{
+                            value: children.value || undefined,
+                            label: children.label || undefined,
+                        }"
+                    >
+                        {{ children.label || '' }}
+                    </component>
+                </template>
+            </component>
         </n-form-item>
         <n-form-item>
             <n-button @click="onSubmit"> Submit </n-button>
@@ -19,21 +33,6 @@
     </n-form>
     <p v-else>Insert your JSON schema</p>
 </template>
-
-<script>
-import { NForm, NFormItem, NInput, NButton, NSelect, NDatePicker, NAlert } from 'naive-ui';
-export default {
-    components: {
-        NForm,
-        NFormItem,
-        NInput,
-        NButton,
-        NSelect,
-        NDatePicker,
-        NAlert,
-    },
-};
-</script>
 
 <script setup>
 import { ref, onBeforeMount } from 'vue';
@@ -53,8 +52,8 @@ const rules = ref({});
 const components = ref([]);
 const invalid = ref(false);
 
-function onSubmit(event) {
-    event.preventDefault();
+function onSubmit(e) {
+    e.preventDefault();
     formRef.value?.validate(errors => {
         if (!errors) {
             invalid.value = false;
@@ -86,12 +85,13 @@ onBeforeMount(() => {
     let formVal = {};
     const typeRules = {
         date: 'number',
+        switch: 'boolean',
+        checkbox: 'array',
     };
     const schema = typeof props.schema === 'string' ? parseJson(props.schema) : props.schema;
-
     for (const [key, value] of Object.entries(schema)) {
         // value
-        formVal[key] = null;
+        formVal[key] = value.type === 'switch' ? false : null;
         // rules
         if (value.required) {
             r[key] = [
@@ -127,6 +127,40 @@ onBeforeMount(() => {
                     type: 'date',
                     label: schema[key].label,
                     path: key,
+                });
+            } else if (value.type === 'switch') {
+                arrComp.push({
+                    name: 'n-switch',
+                    label: schema[key].label,
+                    path: key,
+                });
+            } else if (value.type === 'radio') {
+                const options = value.options.map(e => {
+                    return {
+                        value: e,
+                        label: e,
+                        name: 'n-radio',
+                    };
+                });
+                arrComp.push({
+                    name: 'n-radio-group',
+                    label: schema[key].label,
+                    path: key,
+                    children: options,
+                });
+            } else if (value.type === 'checkbox') {
+                const options = value.options.map(e => {
+                    return {
+                        value: e,
+                        label: e,
+                        name: 'n-checkbox',
+                    };
+                });
+                arrComp.push({
+                    name: 'n-checkbox-group',
+                    label: schema[key].label,
+                    path: key,
+                    children: options,
                 });
             }
         } else {
